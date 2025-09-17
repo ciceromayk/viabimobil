@@ -10,6 +10,32 @@ st.set_page_config(
 
 st.title("📈 Análise de Resultados")
 
+# Adiciona CSS para o estilo dos cards
+st.markdown("""
+<style>
+    .card {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        transition: 0.3s;
+        background-color: #f0f2f6;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .card-title {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #262626;
+    }
+    .card-metric {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #4d94ff;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Verifica se os dados foram salvos na página de entrada
 if "dados_projeto" not in st.session_state:
     st.warning("Por favor, preencha os dados na página 'Dados de Entrada' primeiro.")
@@ -42,23 +68,60 @@ else:
     
     st.markdown("---")
     
-    # Exibe os indicadores-chave
     st.header("Indicadores-Chave")
-    
     col1, col2, col3 = st.columns(3)
+    
     with col1:
-        st.metric("Área Construída", f"{resultados['area_construida']:,.2f} m²")
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Área Construída</div>
+            <div class="card-metric">{resultados['area_construida']:,.2f} m²</div>
+        </div>
+        """, unsafe_allow_html=True)
+
     with col2:
-        st.metric("Área Privativa", f"{resultados['area_privativa']:,.2f} m²")
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Área Privativa</div>
+            <div class="card-metric">{resultados['area_privativa']:,.2f} m²</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
     with col3:
-        st.metric("V.G.V.", f"R$ {resultados['vgv']:,.2f}")
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">V.G.V.</div>
+            <div class="card-metric">R$ {resultados['vgv']:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("---")
     
     st.header("Resumo Financeiro")
     
-    col4, col5 = st.columns(2)
+    col4, col5, col6 = st.columns(3)
+    
     with col4:
-        st.metric("Custo Total", f"R$ {resultados['custo_total']:,.2f}")
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Custo Total</div>
+            <div class="card-metric">R$ {resultados['custo_total']:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
     with col5:
-        st.metric("Resultado do Negócio", f"R$ {resultados['resultado_negocio']:,.2f}")
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Resultado do Negócio</div>
+            <div class="card-metric">R$ {resultados['resultado_negocio']:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col6:
+        margem_lucro = (resultados['resultado_negocio'] / resultados['vgv']) * 100 if resultados['vgv'] != 0 else 0
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Margem de Lucro</div>
+            <div class="card-metric">{margem_lucro:,.2f}%</div>
+        </div>
+        """, unsafe_allow_html=True)
