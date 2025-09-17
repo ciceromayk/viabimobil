@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-from numpy.lib.financial import npv, irr
+from numpy.financial import npv, irr
 
 # Importa as funções do módulo src
 from src.calculos_financieros import calcular_fluxo_de_caixa_projetado
