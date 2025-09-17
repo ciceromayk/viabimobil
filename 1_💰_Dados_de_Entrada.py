@@ -2,9 +2,6 @@ import streamlit as st
 import pandas as pd
 from babel.numbers import format_currency, format_decimal
 
-# Importa a função do módulo src
-from src.calculos_financeiros import calcular_resultado_negocio
-
 st.set_page_config(
     page_title="Viabilidade Imobiliária",
     page_icon="🏠",
@@ -87,13 +84,19 @@ with st.expander("2. Custos Diretos"):
 with st.expander("3. Custos Indiretos"):
     preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0, key="preco_medio_vendas")
 
-    # Calcula o VGV para exibir os valores absolutos na tabela
+    st.subheader("Custos indiretos baseados no VGV")
+    
+    # O valor do VGV (calculado na seção '4. Vendas') é necessário para exibir a tabela de custos.
+    # Como a página é executada de cima para baixo, o valor de 'preco_medio_vendas'
+    # já estará disponível aqui.
     area_privativa = area_terreno * indice_aproveitamento
     if relacao_privativa_construida == 0:
         area_construida = 0
     else:
         area_construida = area_privativa / relacao_privativa_construida
-    vgv = preco_medio_vendas * area_privativa if 'preco_medio_vendas' in locals() else 0
+    # O input de 'preco_medio_vendas' foi movido para a seção '4. Vendas'.
+    # Usamos o valor do 'session_state' para garantir que o cálculo seja feito.
+    vgv = st.session_state.get('preco_medio_vendas', 0) * area_privativa
 
     # Define os valores padrão da tabela de custos indiretos
     if 'custos_indiretos_padrao' not in st.session_state:
@@ -106,11 +109,6 @@ with st.expander("3. Custos Indiretos"):
             {'Custo': 'Assessoria Técnica', '%': 0.70},
             {'Custo': 'Projetos', '%': 0.52},
             {'Custo': 'Licenciamento e Incorporação', '%': 0.20},
-            {'Custo': 'Outorga Onerosa', '%': 0.00},
-            {'Custo': 'Condomínio', '%': 0.00},
-            {'Custo': 'IPTU', '%': 0.07},
-            {'Custo': 'Preparação do Terreno', '%': 0.33},
-            {'Custo': 'Financiamento Bancário', '%': 1.90},
         ])
     
     # Cria uma cópia da tabela para exibição, adicionando a coluna de valor em R$
@@ -127,23 +125,52 @@ with st.expander("3. Custos Indiretos"):
         },
         hide_index=True,
         num_rows="fixed",
-        height=450,
+        height=300,
         key="data_editor_custos"
     )
     st.session_state.custos_indiretos_padrao = custos_indiretos_editavel[['Custo', '%']]
+
+    st.subheader("Custos relacionados ao Terreno / Produto")
+    col4, col5 = st.columns(2)
+    with col4:
+        outorga_onerosa = st.number_input("Outorga Onerosa (R$)", min_value=0.0, key="outorga_onerosa")
+        condominio = st.number_input("Condomínio (R$)", min_value=0.0, key="condominio")
+        iptu = st.number_input("IPTU (R$)", min_value=0.0, key="iptu")
+    with col5:
+        preparacao_terreno = st.number_input("Preparação do Terreno (R$)", min_value=0.0, key="preparacao_terreno")
+        financiamento_bancario = st.number_input("Financiamento Bancário (R$)", min_value=0.0, key="financiamento_bancario")
 
 with st.expander("4. Vendas"):
     st.markdown("Os resultados da viabilidade serão atualizados com base nos custos e vendas inseridos.")
     
 # --- Execução do cálculo e exibição de resultados ---
-resultados = calcular_resultado_negocio(
-    area_terreno=area_terreno,
-    indice_aproveitamento=indice_aproveitamento,
-    custo_direto_construcao_m2=custo_direto_construcao_m2,
-    relacao_privativa_construida=relacao_privativa_construida,
-    preco_medio_vendas=preco_medio_vendas,
-    custos_indiretos_data=custos_indiretos_editavel.to_dict('records')
+
+# Reúne todos os custos indiretos para o cálculo final
+custos_indiretos_percentuais_total = custos_indiretos_editavel['%'].sum()
+custos_indiretos_monetarios_total = (
+    outorga_onerosa + 
+    condominio + 
+    iptu + 
+    preparacao_terreno + 
+    financiamento_bancario
 )
+
+# Calcula as métricas finais
+custo_direto_total = area_construida * custo_direto_construcao_m2
+custos_indiretos_vgv_total = (custos_indiretos_percentuais_total / 100) * vgv
+custos_indiretos_total = custos_indiretos_vgv_total + custos_indiretos_monetarios_total
+custo_total = custo_direto_total + custos_indiretos_total
+resultado_negocio = vgv - custo_total
+
+resultados = {
+    'area_privativa': area_privativa,
+    'area_construida': area_construida,
+    'vgv': vgv,
+    'custo_direto_total': custo_direto_total,
+    'custos_indiretos_total': custos_indiretos_total,
+    'custo_total': custo_total,
+    'resultado_negocio': resultado_negocio
+}
 
 st.markdown("---")
 # Resumo do Projeto
