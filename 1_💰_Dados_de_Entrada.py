@@ -1,12 +1,9 @@
 import streamlit as st
 import pandas as pd
-import locale
+from babel.numbers import format_currency, format_decimal
 
 # Importa a função do módulo src
 from src.calculos_financeiros import calcular_resultado_negocio
-
-# Configura o locale para formatação de números em padrão brasileiro
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 st.set_page_config(
     page_title="Viabilidade Imobiliária",
@@ -56,10 +53,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Função para formatar números para o padrão brasileiro
-def format_brl(value):
-    return locale.currency(value, grouping=True, symbol='R$ ')
-
 st.title("💰 Análise de Viabilidade Imobiliária")
 st.write("Insira os parâmetros para a análise de viabilidade do seu projeto imobiliário.")
 
@@ -92,6 +85,8 @@ with st.expander("2. Custos Diretos"):
     custo_direto_construcao_m2 = st.number_input("Custo Direto de Construção (R$/m²)", min_value=0.0, key="custo_direto_construcao")
 
 with st.expander("3. Custos Indiretos"):
+    preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0, key="preco_medio_vendas")
+
     # Calcula o VGV para exibir os valores absolutos na tabela
     area_privativa = area_terreno * indice_aproveitamento
     if relacao_privativa_construida == 0:
@@ -138,8 +133,8 @@ with st.expander("3. Custos Indiretos"):
     st.session_state.custos_indiretos_padrao = custos_indiretos_editavel[['Custo', '%']]
 
 with st.expander("4. Vendas"):
-    preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0, key="preco_medio_vendas")
-
+    st.markdown("Os resultados da viabilidade serão atualizados com base nos custos e vendas inseridos.")
+    
 # --- Execução do cálculo e exibição de resultados ---
 resultados = calcular_resultado_negocio(
     area_terreno=area_terreno,
@@ -158,35 +153,35 @@ with col1:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Área do Terreno</div>
-        <div class="card-metric">{locale.format_string('%.2f', area_terreno, grouping=True)} m²</div>
+        <div class="card-metric">{format_decimal(area_terreno, locale='pt_BR')} m²</div>
     </div>
     """, unsafe_allow_html=True)
 with col2:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Índice de Aproveitamento</div>
-        <div class="card-metric">{locale.format_string('%.2f', indice_aproveitamento, grouping=True)}</div>
+        <div class="card-metric">{format_decimal(indice_aproveitamento, locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
 with col3:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Área Construída</div>
-        <div class="card-metric">{locale.format_string('%.2f', resultados['area_construida'], grouping=True)} m²</div>
+        <div class="card-metric">{format_decimal(resultados['area_construida'], locale='pt_BR')} m²</div>
     </div>
     """, unsafe_allow_html=True)
 with col4:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Área Privativa</div>
-        <div class="card-metric">{locale.format_string('%.2f', resultados['area_privativa'], grouping=True)} m²</div>
+        <div class="card-metric">{format_decimal(resultados['area_privativa'], locale='pt_BR')} m²</div>
     </div>
     """, unsafe_allow_html=True)
 with col5:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Relação AP/AC</div>
-        <div class="card-metric">{locale.format_string('%.2f', relacao_privativa_construida, grouping=True)}</div>
+        <div class="card-metric">{format_decimal(relacao_privativa_construida, locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -199,21 +194,21 @@ with col_custos_1:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Custos Diretos</div>
-        <div class="card-metric">{format_brl(resultados['custo_direto_total'])}</div>
+        <div class="card-metric">{format_currency(resultados['custo_direto_total'], 'BRL', locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
 with col_custos_2:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Custos Indiretos</div>
-        <div class="card-metric">{format_brl(resultados['custos_indiretos_total'])}</div>
+        <div class="card-metric">{format_currency(resultados['custos_indiretos_total'], 'BRL', locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
 with col_custos_3:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Custo Total</div>
-        <div class="card-metric">{format_brl(resultados['custo_total'])}</div>
+        <div class="card-metric">{format_currency(resultados['custo_total'], 'BRL', locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -226,7 +221,7 @@ with col6:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">V.G.V.</div>
-        <div class="card-metric">{format_brl(resultados['vgv'])}</div>
+        <div class="card-metric">{format_currency(resultados['vgv'], 'BRL', locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
 with col7:
@@ -235,7 +230,7 @@ with col7:
     st.markdown(f"""
     <div class="card {card_class}">
         <div class="card-title">Resultado do Negócio</div>
-        <div class="card-metric">{format_brl(resultado_negocio)}</div>
+        <div class="card-metric">{format_currency(resultado_negocio, 'BRL', locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
 with col8:
@@ -244,6 +239,6 @@ with col8:
     st.markdown(f"""
     <div class="card {card_class}">
         <div class="card-title">Margem de Lucro</div>
-        <div class="card-metric">{locale.format_string('%.2f', margem_lucro, grouping=True)}%</div>
+        <div class="card-metric">{format_decimal(margem_lucro, locale='pt_BR')}%</div>
     </div>
     """, unsafe_allow_html=True)
