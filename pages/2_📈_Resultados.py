@@ -52,8 +52,21 @@ else:
     st.header("Análise de Cenários")
     st.write("Altere o preço de vendas para simular o impacto no resultado do negócio.")
 
-    # Colunas para organizar os cards e o slider
-    col_preco_original, col_preco_ajustado, col_slider = st.columns([1, 1, 1.5])
+    # Slider para controlar a variação do preço
+    variacao_preco = st.slider(
+        "Variação no Preço (%)",
+        min_value=-20,
+        max_value=20,
+        value=0,
+        step=1,
+        key='variacao_preco'
+    )
+    
+    # Aplica a variação ao preço de venda
+    preco_ajustado = dados_projeto["preco_medio_vendas"] * (1 + variacao_preco / 100)
+
+    # Colunas para organizar os cards
+    col_preco_original, col_preco_ajustado = st.columns([1, 1])
     
     with col_preco_original:
         st.markdown(f"""
@@ -64,25 +77,12 @@ else:
         """, unsafe_allow_html=True)
     
     with col_preco_ajustado:
-        # Define o slider e o preço ajustado dentro da mesma coluna
-        preco_ajustado = dados_projeto["preco_medio_vendas"] * (1 + st.session_state['variacao_preco'] / 100)
         st.markdown(f"""
         <div class="card">
             <div class="card-title">Preço Ajustado (R$/m²)</div>
             <div class="card-metric">R$ {preco_ajustado:,.2f}</div>
         </div>
         """, unsafe_allow_html=True)
-    
-    with col_slider:
-        st.write("Variação do Preço (%)")
-        st.slider(
-            "Variação no Preço (%)",
-            min_value=-20,
-            max_value=20,
-            value=0,
-            step=1,
-            key='variacao_preco'
-        )
 
     # Recalcula os resultados com o novo preço
     resultados = calcular_resultado_negocio(
