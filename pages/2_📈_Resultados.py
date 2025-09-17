@@ -14,22 +14,26 @@ st.title("📈 Análise de Resultados")
 st.markdown("""
 <style>
     .card {
-        padding: 20px;
+        padding: 15px;
         border-radius: 10px;
         box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
         transition: 0.3s;
         background-color: #f0f2f6;
         text-align: center;
         margin-bottom: 20px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
     .card-title {
-        font-size: 1.2em;
+        font-size: 0.9em;
         font-weight: bold;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
         color: #262626;
     }
     .card-metric {
-        font-size: 2.5em;
+        font-size: 1.5em;
         font-weight: bold;
         color: #4d94ff;
     }
@@ -68,8 +72,9 @@ else:
     
     st.markdown("---")
     
-    st.header("Indicadores-Chave")
-    col1, col2, col3 = st.columns(3)
+    st.header("Resumo do Projeto")
+    
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
         st.markdown(f"""
@@ -95,12 +100,6 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("---")
-    
-    st.header("Resumo Financeiro")
-    
-    col4, col5, col6 = st.columns(3)
-    
     with col4:
         st.markdown(f"""
         <div class="card">
