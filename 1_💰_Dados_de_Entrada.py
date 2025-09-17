@@ -132,7 +132,7 @@ resultados = calcular_resultado_negocio(
     custo_direto_construcao_m2=custo_direto_construcao_m2,
     relacao_privativa_construida=relacao_privativa_construida,
     preco_medio_vendas=preco_medio_vendas,
-    custos_indiretos_percentual=total_percentual_custos_indiretos
+    custos_indiretos_data=custos_indiretos_editavel.to_dict('records')
 )
 
 st.markdown("---")
@@ -140,6 +140,7 @@ st.markdown("---")
 # Resumo do Projeto
 st.header("Resumo do Projeto")
 col1, col2, col3, col4, col5 = st.columns(5)
+    
 with col1:
     st.markdown(f"""
     <div class="card neutral">
@@ -154,6 +155,7 @@ with col2:
         <div class="card-metric">{indice_aproveitamento:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
+    
 with col3:
     st.markdown(f"""
     <div class="card neutral">
@@ -161,6 +163,7 @@ with col3:
         <div class="card-metric">{resultados['area_construida']:,.2f} m²</div>
     </div>
     """, unsafe_allow_html=True)
+    
 with col4:
     st.markdown(f"""
     <div class="card neutral">
@@ -168,6 +171,7 @@ with col4:
         <div class="card-metric">{resultados['area_privativa']:,.2f} m²</div>
     </div>
     """, unsafe_allow_html=True)
+    
 with col5:
     st.markdown(f"""
     <div class="card neutral">
