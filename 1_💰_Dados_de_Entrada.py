@@ -14,25 +14,25 @@ st.set_page_config(
 st.markdown("""
 <style>
     .card {
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
         transition: 0.3s;
         text-align: center;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        margin: 10px;
+        margin: 5px;
     }
     .card-title {
-        font-size: 0.9em;
+        font-size: 0.8em;
         font-weight: bold;
-        margin-bottom: 5px;
+        margin-bottom: 3px;
         color: #262626;
     }
     .card-metric {
-        font-size: 1.5em;
+        font-size: 1.2em;
         font-weight: bold;
         color: #4d94ff;
         word-wrap: break-word; /* Garante que os números se quebrem se forem muito longos */
@@ -48,6 +48,11 @@ st.markdown("""
     .card.neutral {
         background-color: #f0f2f6;
         border: 1px solid #e0e0e0;
+    }
+    /* Ajusta a barra lateral para ser mais compacta */
+    .st-emotion-cache-1cypcdb {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -212,7 +217,6 @@ with col9:
     # Lógica para colorir o card de Margem de Lucro
     margem_lucro = (resultados_ajustados['resultado_negocio'] / resultados_ajustados['vgv']) * 100 if resultados_ajustados['vgv'] != 0 else 0
     card_class = "positive" if margem_lucro > 0 else "negative" if margem_lucro < 0 else "neutral"
-
     st.markdown(f"""
     <div class="card {card_class}">
         <div class="card-title">Margem de Lucro</div>
