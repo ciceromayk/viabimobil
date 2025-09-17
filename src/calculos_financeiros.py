@@ -6,7 +6,8 @@ def calcular_resultado_negocio(
     custo_direto_construcao_m2: float,
     relacao_privativa_construida: float,
     preco_medio_vendas: float,
-    custos_indiretos_percentual: float
+    custos_indiretos_percentual: float,
+    custos_indiretos_absoluto: float
 ):
     """
     Calcula os indicadores financeiros chave do projeto, incluindo custos diretos e indiretos.
@@ -22,15 +23,15 @@ def calcular_resultado_negocio(
         area_construida = 0
     else:
         area_construida = area_privativa / relacao_privativa_construida
-
-    # 3. Calcular o Custo Direto de Construção
-    custo_direto_total = area_construida * custo_direto_construcao_m2
     
-    # 4. Calcular o Valor Geral de Vendas (V.G.V.)
+    # 3. Calcular o Valor Geral de Vendas (V.G.V.)
     vgv = preco_medio_vendas * area_privativa
     
+    # 4. Calcular o Custo Direto
+    custo_direto_total = area_construida * custo_direto_construcao_m2
+
     # 5. Calcular os Custos Indiretos totais
-    custos_indiretos_total = vgv * (custos_indiretos_percentual / 100)
+    custos_indiretos_total = (vgv * (custos_indiretos_percentual / 100)) + custos_indiretos_absoluto
     
     # 6. Calcular o Custo Total
     custo_total = custo_direto_total + custos_indiretos_total
