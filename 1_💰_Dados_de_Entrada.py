@@ -59,10 +59,7 @@ st.markdown("""
 
 # ----- Sidebar para Parâmetros de Entrada -----
 with st.sidebar:
-    st.header("Análise de Viabilidade")
     st.subheader("Parâmetros do Projeto")
-    st.markdown("---")
-    
     st.subheader("1. Terreno e Construção")
     area_terreno = st.number_input("Área do Terreno (m²)", min_value=0.0)
     indice_aproveitamento = st.slider(
@@ -80,9 +77,6 @@ with st.sidebar:
         value=0.70,
         step=0.01,
     )
-    
-    st.markdown("---")
-
     st.subheader("2. Vendas")
     preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
 
