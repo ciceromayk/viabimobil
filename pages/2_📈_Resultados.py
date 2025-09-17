@@ -52,7 +52,7 @@ else:
     st.header("Análise de Cenários")
     st.write("Altere o preço de vendas para simular o impacto no resultado do negócio.")
 
-    col_preco_original, col_preco_ajustado = st.columns([1, 1])
+    col_preco_original, col_preco_ajustado, col_slider = st.columns([1, 1, 2])
     
     with col_preco_original:
         st.markdown(f"""
@@ -63,7 +63,6 @@ else:
         """, unsafe_allow_html=True)
     
     with col_preco_ajustado:
-        # Aplica a variação ao preço de venda para o card ajustado
         variacao_preco = st.slider(
             "Variação no Preço (%)",
             min_value=-20,
@@ -78,6 +77,13 @@ else:
             <div class="card-metric">R$ {preco_ajustado:,.2f}</div>
         </div>
         """, unsafe_allow_html=True)
+
+    with col_slider:
+        st.write("") # Adiciona espaço para alinhamento
+        st.write("")
+        st.write("")
+        st.write("")
+        st.slider("Variação do Preço (%)", min_value=-20, max_value=20, value=variacao_preco, key="slider_hidden")
 
     # Recalcula os resultados com o novo preço
     resultados = calcular_resultado_negocio(
