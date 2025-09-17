@@ -10,9 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("💰 Análise de Viabilidade Imobiliária")
-st.write("Insira os parâmetros para a análise de viabilidade do seu projeto imobiliário.")
-
+# Adiciona CSS para o estilo dos cards
 st.markdown("""
 <style>
     .card {
@@ -38,15 +36,16 @@ st.markdown("""
         font-size: 1.5em;
         font-weight: bold;
         color: #4d94ff;
-        word-wrap: break-word;
+        word-wrap: break-word; /* Garante que os números se quebrem se forem muito longos */
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.subheader("Parâmetros do Projeto")
-col_construcao, col_vendas = st.columns(2)
-
-with col_construcao:
+# ----- Sidebar para Parâmetros de Entrada -----
+with st.sidebar:
+    st.header("Parâmetros do Projeto")
+    st.markdown("---")
+    
     st.subheader("1. Terreno e Construção")
     area_terreno = st.number_input("Área do Terreno (m²)", min_value=0.0)
     indice_aproveitamento = st.slider(
@@ -64,14 +63,15 @@ with col_construcao:
         value=0.70,
         step=0.01,
     )
-
-with col_vendas:
-    st.subheader("2. Vendas")
-    st.write("")
-    st.write("")
-    preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
     
-st.markdown("---")
+    st.markdown("---")
+
+    st.subheader("2. Vendas")
+    preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
+
+# ----- Main Content (Conteúdo Principal) -----
+st.title("💰 Análise de Viabilidade Imobiliária")
+st.write("Insira os parâmetros no menu lateral para a análise de viabilidade do seu projeto imobiliário.")
 
 # Seção de Resultados (agora em tempo real)
 st.header("Análise de Cenários")
