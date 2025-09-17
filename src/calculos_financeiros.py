@@ -11,11 +11,13 @@ def calcular_resultado_negocio(
     Calcula os indicadores financeiros chave do projeto.
     Retorna um dicionário com VGV, Custo Total e Resultado do Negócio.
     """
-    # 1. Calcular a Área Construída com base no índice de aproveitamento
-    area_construida = area_terreno * indice_aproveitamento
     
-    # 2. Calcular a Área Privativa com base na relação
-    area_privativa = area_construida * relacao_privativa_construida
+    # 1. Calcular a Área Privativa
+    area_privativa = area_terreno * indice_aproveitamento
+    
+    # 2. Calcular a Área Construída com base na relação AP/AC
+    # A fórmula é Área Construída = Área Privativa / Relação AP/AC
+    area_construida = area_privativa / relacao_privativa_construida
     
     # 3. Calcular o Custo Total
     custo_total = area_construida * custo_por_metro_quadrado
