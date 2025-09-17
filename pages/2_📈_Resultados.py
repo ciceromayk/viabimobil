@@ -65,7 +65,7 @@ else:
     # Aplica a variação ao preço de venda
     preco_ajustado = dados_projeto["preco_medio_vendas"] * (1 + variacao_preco / 100)
 
-    # Colunas para organizar os cards
+    # Colunas para organizar os cards de preço
     col_preco_original, col_preco_ajustado = st.columns([1, 1])
     
     with col_preco_original:
@@ -95,19 +95,35 @@ else:
     
     st.markdown("---")
     
+    # Resumo do Projeto
     st.header("Resumo do Projeto")
-    
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Área do Terreno</div>
+            <div class="card-metric">{dados_projeto['area_terreno']:,.2f} m²</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Índice de Aproveitamento</div>
+            <div class="card-metric">{dados_projeto['indice_aproveitamento']:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
         st.markdown(f"""
         <div class="card">
             <div class="card-title">Área Construída</div>
             <div class="card-metric">{resultados['area_construida']:,.2f} m²</div>
         </div>
         """, unsafe_allow_html=True)
-
-    with col2:
+    
+    with col4:
         st.markdown(f"""
         <div class="card">
             <div class="card-title">Área Privativa</div>
@@ -115,7 +131,21 @@ else:
         </div>
         """, unsafe_allow_html=True)
     
-    with col3:
+    with col5:
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Relação AP/AC</div>
+            <div class="card-metric">{dados_projeto['relacao_privativa_construida']:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # Resumo Financeiro
+    st.header("Resumo Financeiro")
+    col6, col7, col8, col9 = st.columns(4)
+    
+    with col6:
         st.markdown(f"""
         <div class="card">
             <div class="card-title">V.G.V.</div>
@@ -123,7 +153,7 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-    with col4:
+    with col7:
         st.markdown(f"""
         <div class="card">
             <div class="card-title">Custo Total</div>
@@ -131,7 +161,7 @@ else:
         </div>
         """, unsafe_allow_html=True)
     
-    with col5:
+    with col8:
         st.markdown(f"""
         <div class="card">
             <div class="card-title">Resultado do Negócio</div>
@@ -139,7 +169,7 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-    with col6:
+    with col9:
         margem_lucro = (resultados['resultado_negocio'] / resultados['vgv']) * 100 if resultados['vgv'] != 0 else 0
         st.markdown(f"""
         <div class="card">
