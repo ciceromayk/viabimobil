@@ -18,7 +18,6 @@ st.markdown("""
         border-radius: 10px;
         box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
         transition: 0.3s;
-        background-color: #f0f2f6;
         text-align: center;
         height: 100%;
         display: flex;
@@ -38,12 +37,25 @@ st.markdown("""
         color: #4d94ff;
         word-wrap: break-word; /* Garante que os números se quebrem se forem muito longos */
     }
+    .card.positive {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+    }
+    .card.negative {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+    }
+    .card.neutral {
+        background-color: #f0f2f6;
+        border: 1px solid #e0e0e0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ----- Sidebar para Parâmetros de Entrada -----
 with st.sidebar:
-    st.header("Parâmetros do Projeto")
+    st.header("Análise de Viabilidade")
+    st.subheader("Parâmetros do Projeto")
     st.markdown("---")
     
     st.subheader("1. Terreno e Construção")
@@ -93,7 +105,7 @@ col_preco_original, col_preco_ajustado = st.columns(2)
     
 with col_preco_original:
     st.markdown(f"""
-    <div class="card">
+    <div class="card neutral">
         <div class="card-title">Preço Original (R$/m²)</div>
         <div class="card-metric">R$ {preco_medio_vendas:,.2f}</div>
     </div>
@@ -101,7 +113,7 @@ with col_preco_original:
     
 with col_preco_ajustado:
     st.markdown(f"""
-    <div class="card">
+    <div class="card neutral">
         <div class="card-title">Preço Ajustado (R$/m²)</div>
         <div class="card-metric">R$ {preco_ajustado:,.2f}</div>
     </div>
@@ -124,7 +136,7 @@ col1, col2, col3, col4, col5 = st.columns(5)
     
 with col1:
     st.markdown(f"""
-    <div class="card">
+    <div class="card neutral">
         <div class="card-title">Área do Terreno</div>
         <div class="card-metric">{area_terreno:,.2f} m²</div>
     </div>
@@ -132,7 +144,7 @@ with col1:
 
 with col2:
     st.markdown(f"""
-    <div class="card">
+    <div class="card neutral">
         <div class="card-title">Índice de Aproveitamento</div>
         <div class="card-metric">{indice_aproveitamento:,.2f}</div>
     </div>
@@ -140,7 +152,7 @@ with col2:
     
 with col3:
     st.markdown(f"""
-    <div class="card">
+    <div class="card neutral">
         <div class="card-title">Área Construída</div>
         <div class="card-metric">{resultados_ajustados['area_construida']:,.2f} m²</div>
     </div>
@@ -148,7 +160,7 @@ with col3:
     
 with col4:
     st.markdown(f"""
-    <div class="card">
+    <div class="card neutral">
         <div class="card-title">Área Privativa</div>
         <div class="card-metric">{resultados_ajustados['area_privativa']:,.2f} m²</div>
     </div>
@@ -156,7 +168,7 @@ with col4:
     
 with col5:
     st.markdown(f"""
-    <div class="card">
+    <div class="card neutral">
         <div class="card-title">Relação AP/AC</div>
         <div class="card-metric">{relacao_privativa_construida:,.2f}</div>
     </div>
@@ -170,7 +182,7 @@ col6, col7, col8, col9 = st.columns(4)
     
 with col6:
     st.markdown(f"""
-    <div class="card">
+    <div class="card neutral">
         <div class="card-title">V.G.V.</div>
         <div class="card-metric">R$ {resultados_ajustados['vgv']:,.2f}</div>
     </div>
@@ -178,24 +190,31 @@ with col6:
 
 with col7:
     st.markdown(f"""
-    <div class="card">
+    <div class="card neutral">
         <div class="card-title">Custo Total</div>
         <div class="card-metric">R$ {resultados_ajustados['custo_total']:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
     
 with col8:
+    # Lógica para colorir o card de Resultado do Negócio
+    resultado_negocio = resultados_ajustados['resultado_negocio']
+    card_class = "positive" if resultado_negocio > 0 else "negative" if resultado_negocio < 0 else "neutral"
+
     st.markdown(f"""
-    <div class="card">
+    <div class="card {card_class}">
         <div class="card-title">Resultado do Negócio</div>
-        <div class="card-metric">R$ {resultados_ajustados['resultado_negocio']:,.2f}</div>
+        <div class="card-metric">R$ {resultado_negocio:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
 
 with col9:
+    # Lógica para colorir o card de Margem de Lucro
     margem_lucro = (resultados_ajustados['resultado_negocio'] / resultados_ajustados['vgv']) * 100 if resultados_ajustados['vgv'] != 0 else 0
+    card_class = "positive" if margem_lucro > 0 else "negative" if margem_lucro < 0 else "neutral"
+
     st.markdown(f"""
-    <div class="card">
+    <div class="card {card_class}">
         <div class="card-title">Margem de Lucro</div>
         <div class="card-metric">{margem_lucro:,.2f}%</div>
     </div>
