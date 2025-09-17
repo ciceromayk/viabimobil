@@ -80,18 +80,44 @@ with st.sidebar:
 
     st.subheader("2. Vendas")
     preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
+    
+    st.markdown("---")
+    
+    # Expansor para Custos Indiretos
+    with st.expander("Custos Indiretos (%)"):
+        st.write("Insira os percentuais sobre o VGV:")
+        # Valores padrão com base na imagem fornecida
+        irpj = st.number_input("IRPJ/CS/PIS/COFINS", min_value=0.0, value=4.00)
+        corretagem = st.number_input("Corretagem", min_value=0.0, value=3.61)
+        publicidade = st.number_input("Publicidade", min_value=0.0, value=0.90)
+        manutencao = st.number_input("Manutenção", min_value=0.0, value=0.50)
+        custo_fixo = st.number_input("Custo Fixo IDIBRA", min_value=0.0, value=4.00)
+        assessoria = st.number_input("Assessoria Técnica", min_value=0.0, value=0.70)
+        projetos = st.number_input("Projetos", min_value=0.0, value=0.52)
+        licenciamento = st.number_input("Licenciamento e Incorporação", min_value=0.0, value=0.20)
+        outorga = st.number_input("Outorga Onerosa", min_value=0.0, value=0.00)
+        condominio = st.number_input("Condomínio", min_value=0.0, value=0.00)
+        iptu = st.number_input("IPTU", min_value=0.0, value=0.07)
+        preparacao_terreno = st.number_input("Preparação do Terreno", min_value=0.0, value=0.33)
+        financiamento = st.number_input("Financiamento Bancário", min_value=0.0, value=1.90)
+
+        # Soma dos custos indiretos
+        custos_indiretos_percentual = iptu + corretagem + publicidade + manutencao + custo_fixo + assessoria + projetos + licenciamento + outorga + condominio + preparacao_terreno + financiamento
+
+        st.metric("Total de Custos Indiretos", f"{custos_indiretos_percentual:,.2f}%")
 
 # ----- Main Content (Conteúdo Principal) -----
 st.title("💰 Análise de Viabilidade Imobiliária")
 st.write("Insira os parâmetros no menu lateral para a análise de viabilidade do seu projeto imobiliário.")
-    
+
 # Recalcula os resultados com base nos parâmetros da barra lateral
 resultados = calcular_resultado_negocio(
     area_terreno=area_terreno,
     indice_aproveitamento=indice_aproveitamento,
     custo_direto_construcao_m2=custo_direto_construcao_m2,
     relacao_privativa_construida=relacao_privativa_construida,
-    preco_medio_vendas=preco_medio_vendas
+    preco_medio_vendas=preco_medio_vendas,
+    custos_indiretos_percentual=custos_indiretos_percentual
 )
 
 st.markdown("---")
