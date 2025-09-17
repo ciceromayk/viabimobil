@@ -45,12 +45,13 @@ st.markdown("""
 
 st.markdown("---")
 
-# Seção de Terreno e Construção
-st.subheader("1. Terreno e Parâmetros de Construção")
-col1, col2 = st.columns(2)
-with col1:
+# Seção de Parâmetros de Entrada
+st.subheader("Parâmetros do Projeto")
+col_construcao, col_vendas = st.columns(2)
+
+with col_construcao:
+    st.subheader("1. Terreno e Construção")
     area_terreno = st.number_input("Área do Terreno (m²)", min_value=0.0)
-with col2:
     indice_aproveitamento = st.slider(
         "Índice de Aproveitamento",
         min_value=1.00,
@@ -58,11 +59,7 @@ with col2:
         value=1.00,
         step=0.01,
     )
-
-col3, col4 = st.columns(2)
-with col3:
     custo_por_metro_quadrado = st.number_input("Custo de Área Construída (R$/m²)", min_value=0.0)
-with col4:
     relacao_privativa_construida = st.slider(
         "Relação Área Privativa / Área Construída",
         min_value=0.00,
@@ -71,12 +68,12 @@ with col4:
         step=0.01,
     )
 
-st.markdown("---")
-
-# Seção de Vendas
-st.subheader("2. Parâmetros de Vendas")
-preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
-
+with col_vendas:
+    st.subheader("2. Vendas")
+    st.write("")
+    st.write("")
+    preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
+    
 st.markdown("---")
 
 # Botão para calcular e exibir os resultados
