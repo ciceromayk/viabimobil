@@ -71,7 +71,7 @@ with st.sidebar:
     )
     custo_por_metro_quadrado = st.number_input("Custo de Área Construída (R$/m²)", min_value=0.0)
     relacao_privativa_construida = st.slider(
-        "Relação Área Privativa / Área Construída",
+        "Relação AP / AC",
         min_value=0.00,
         max_value=1.00,
         value=0.70,
