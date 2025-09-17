@@ -10,14 +10,14 @@ st.title("🏠 Análise de Viabilidade Imobiliária")
 st.write(
     """
     Bem-vindo ao aplicativo de análise de viabilidade imobiliária!
-    Use este aplicativo para avaliar a viabilidade financeira de projetos de desenvolvimento imobiliário.
+    Use este aplicativo para avaliar a viabilidade financeira de projetos de desenvolvimento imobiliário de forma rápida e intuitiva.
     
     Navegue pelas páginas no menu lateral para:
     
     1.  **Dados de Entrada**: Insira todas as informações do seu projeto.
-    2.  **Resultados**: Visualize os indicadores financeiros, gráficos e simulações.
+    2.  **Resultados**: Visualize os indicadores-chave de viabilidade.
     
-    A análise é baseada em indicadores-chave como o Valor Presente Líquido (VPL), a Taxa Interna de Retorno (TIR) e a margem de lucro.
+    A análise é baseada em indicadores como o Valor Geral de Vendas (V.G.V.), o Custo Total do projeto e o Resultado do Negócio.
     """
 )
 
