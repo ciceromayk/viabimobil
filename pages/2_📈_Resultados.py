@@ -6,6 +6,7 @@ from src.calculos_financeiros import calcular_resultado_negocio
 st.set_page_config(
     page_title="Resultados",
     page_icon="📈",
+    layout="wide"
 )
 
 st.title("📈 Análise de Resultados")
@@ -20,11 +21,11 @@ st.markdown("""
         transition: 0.3s;
         background-color: #f0f2f6;
         text-align: center;
-        margin-bottom: 20px;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        margin: 10px;
     }
     .card-title {
         font-size: 0.9em;
@@ -36,6 +37,7 @@ st.markdown("""
         font-size: 1.5em;
         font-weight: bold;
         color: #4d94ff;
+        word-wrap: break-word; /* Garante que os números se quebrem se forem muito longos */
     }
 </style>
 """, unsafe_allow_html=True)
@@ -46,17 +48,28 @@ if "dados_projeto" not in st.session_state:
 else:
     dados_projeto = st.session_state["dados_projeto"]
 
-    # Simulação de Cenários com slider (Análise de Sensibilidade)
-    st.header("Simulação de Cenários")
+    # Simulação de Cenários: Preço Médio de Vendas
+    st.header("Análise de Cenários")
     st.write("Altere o preço de vendas para simular o impacto no resultado do negócio.")
+
+    col_preco, col_slider = st.columns([1, 2])
     
-    variacao_preco = st.slider(
-        "Variação no Preço Médio de Vendas (%)",
-        min_value=-20,
-        max_value=20,
-        value=0,
-        step=1
-    )
+    with col_preco:
+        st.markdown(f"""
+        <div class="card">
+            <div class="card-title">Preço Médio de Vendas (R$/m²)</div>
+            <div class="card-metric">R$ {dados_projeto['preco_medio_vendas']:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col_slider:
+        variacao_preco = st.slider(
+            "Variação no Preço Médio de Vendas (%)",
+            min_value=-20,
+            max_value=20,
+            value=0,
+            step=1
+        )
     
     # Aplica a variação ao preço de venda
     preco_ajustado = dados_projeto["preco_medio_vendas"] * (1 + variacao_preco / 100)
