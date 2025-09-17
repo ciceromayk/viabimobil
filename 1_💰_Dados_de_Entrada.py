@@ -79,60 +79,56 @@ with col4:
     )
 
 st.subheader("2. Vendas")
-col5, col6 = st.columns(2)
-with col5:
-    preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
+preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
 
-# Expansor para Custos Indiretos
 st.markdown("---")
-st.subheader("3. Custos Indiretos")
-with st.expander("Configurar Custos Indiretos", expanded=False):
-    st.write("Selecione a forma de cálculo:")
-    modo_calculo = st.radio(" ", ["Percentual sobre VGV", "Valor Absoluto (R$)"], key="custo_indireto_mode", horizontal=True)
+st.header("3. Custos Indiretos")
 
-    custos_indiretos_percentual = 0.0
-    custos_indiretos_absoluto = 0.0
+# Valores padrão para a tabela editável
+custos_indiretos_padrao = pd.DataFrame([
+    {'Custo': 'IRPJ/CS/PIS/COFINS', 'Tipo': '%', 'Valor': 4.00},
+    {'Custo': 'Corretagem', 'Tipo': '%', 'Valor': 3.61},
+    {'Custo': 'Publicidade', 'Tipo': '%', 'Valor': 0.90},
+    {'Custo': 'Manutenção', 'Tipo': '%', 'Valor': 0.50},
+    {'Custo': 'Custo Fixo IDIBRA', 'Tipo': '%', 'Valor': 4.00},
+    {'Custo': 'Assessoria Técnica', 'Tipo': '%', 'Valor': 0.70},
+    {'Custo': 'Projetos', 'Tipo': '%', 'Valor': 0.52},
+    {'Custo': 'Licenciamento e Incorporação', 'Tipo': '%', 'Valor': 0.20},
+    {'Custo': 'Outorga Onerosa', 'Tipo': '%', 'Valor': 0.00},
+    {'Custo': 'Condomínio', 'Tipo': '%', 'Valor': 0.00},
+    {'Custo': 'IPTU', 'Tipo': '%', 'Valor': 0.07},
+    {'Custo': 'Preparação do Terreno', 'Tipo': '%', 'Valor': 0.33},
+    {'Custo': 'Financiamento Bancário', 'Tipo': '%', 'Valor': 1.90},
+])
 
-    if modo_calculo == "Percentual sobre VGV":
-        col_irpj, col_corretagem, col_publicidade = st.columns(3)
-        with col_irpj:
-            irpj = st.number_input("IRPJ/CS/PIS/COFINS (%)", min_value=0.0, value=4.00)
-            manutencao = st.number_input("Manutenção (%)", min_value=0.0, value=0.50)
-            outorga = st.number_input("Outorga Onerosa (%)", min_value=0.0, value=0.00)
-            iptu = st.number_input("IPTU (%)", min_value=0.0, value=0.07)
-        with col_corretagem:
-            corretagem = st.number_input("Corretagem (%)", min_value=0.0, value=3.61)
-            custo_fixo = st.number_input("Custo Fixo IDIBRA (%)", min_value=0.0, value=4.00)
-            condominio = st.number_input("Condomínio (%)", min_value=0.0, value=0.00)
-        with col_publicidade:
-            publicidade = st.number_input("Publicidade (%)", min_value=0.0, value=0.90)
-            assessoria = st.number_input("Assessoria Técnica (%)", min_value=0.0, value=0.70)
-            projetos = st.number_input("Projetos (%)", min_value=0.0, value=0.52)
-            licenciamento = st.number_input("Licenciamento e Incorporação (%)", min_value=0.0, value=0.20)
-            preparacao_terreno = st.number_input("Preparação do Terreno (%)", min_value=0.0, value=0.33)
-            financiamento = st.number_input("Financiamento Bancário (%)", min_value=0.0, value=1.90)
+custos_indiretos_editavel = st.data_editor(
+    custos_indiretos_padrao,
+    column_config={
+        "Custo": st.column_config.TextColumn("Custo", disabled=True),
+        "Tipo": st.column_config.SelectboxColumn("Tipo", options=['%', 'R$']),
+        "Valor": st.column_config.NumberColumn("Valor", min_value=0.0)
+    },
+    hide_index=True,
+    num_rows="dynamic",
+    key="data_editor_custos"
+)
 
-        custos_indiretos_percentual = iptu + corretagem + publicidade + manutencao + custo_fixo + assessoria + projetos + licenciamento + outorga + condominio + preparacao_terreno + financiamento
-        st.metric("Total de Custos Indiretos (%)", f"{custos_indiretos_percentual:,.2f}%")
-    else:
-        custos_indiretos_absoluto = st.number_input("Custo Indireto Total (R$)", min_value=0.0)
-
-# Recalcula os resultados com base nos parâmetros
+# Recalcula os resultados com base nos parâmetros da barra lateral
 resultados = calcular_resultado_negocio(
     area_terreno=area_terreno,
     indice_aproveitamento=indice_aproveitamento,
     custo_direto_construcao_m2=custo_direto_construcao_m2,
     relacao_privativa_construida=relacao_privativa_construida,
     preco_medio_vendas=preco_medio_vendas,
-    custos_indiretos_percentual=custos_indiretos_percentual,
-    custos_indiretos_absoluto=custos_indiretos_absoluto
+    custos_indiretos_data=custos_indiretos_editavel.to_dict('records')
 )
 
 st.markdown("---")
-
+    
 # Resumo do Projeto
 st.header("Resumo do Projeto")
 col1, col2, col3, col4, col5 = st.columns(5)
+    
 with col1:
     st.markdown(f"""
     <div class="card neutral">
@@ -140,6 +136,7 @@ with col1:
         <div class="card-metric">{area_terreno:,.2f} m²</div>
     </div>
     """, unsafe_allow_html=True)
+
 with col2:
     st.markdown(f"""
     <div class="card neutral">
@@ -147,6 +144,7 @@ with col2:
         <div class="card-metric">{indice_aproveitamento:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
+    
 with col3:
     st.markdown(f"""
     <div class="card neutral">
@@ -154,6 +152,7 @@ with col3:
         <div class="card-metric">{resultados['area_construida']:,.2f} m²</div>
     </div>
     """, unsafe_allow_html=True)
+    
 with col4:
     st.markdown(f"""
     <div class="card neutral">
@@ -161,6 +160,7 @@ with col4:
         <div class="card-metric">{resultados['area_privativa']:,.2f} m²</div>
     </div>
     """, unsafe_allow_html=True)
+    
 with col5:
     st.markdown(f"""
     <div class="card neutral">
