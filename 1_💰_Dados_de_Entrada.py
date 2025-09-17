@@ -81,46 +81,58 @@ with col4:
 st.subheader("2. Vendas")
 preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
 
+# 3. Custos Indiretos
 st.markdown("---")
 st.header("3. Custos Indiretos")
 
+# Calcula o VGV para exibir o valor absoluto dos custos indiretos
+area_privativa = area_terreno * indice_aproveitamento
+if relacao_privativa_construida == 0:
+    area_construida = 0
+else:
+    area_construida = area_privativa / relacao_privativa_construida
+vgv = preco_medio_vendas * area_privativa
+
 # Valores padrão para a tabela editável
 custos_indiretos_padrao = pd.DataFrame([
-    {'Custo': 'IRPJ/CS/PIS/COFINS', 'Tipo': '%', 'Valor': 4.00},
-    {'Custo': 'Corretagem', 'Tipo': '%', 'Valor': 3.61},
-    {'Custo': 'Publicidade', 'Tipo': '%', 'Valor': 0.90},
-    {'Custo': 'Manutenção', 'Tipo': '%', 'Valor': 0.50},
-    {'Custo': 'Custo Fixo IDIBRA', 'Tipo': '%', 'Valor': 4.00},
-    {'Custo': 'Assessoria Técnica', 'Tipo': '%', 'Valor': 0.70},
-    {'Custo': 'Projetos', 'Tipo': '%', 'Valor': 0.52},
-    {'Custo': 'Licenciamento e Incorporação', 'Tipo': '%', 'Valor': 0.20},
-    {'Custo': 'Outorga Onerosa', 'Tipo': '%', 'Valor': 0.00},
-    {'Custo': 'Condomínio', 'Tipo': '%', 'Valor': 0.00},
-    {'Custo': 'IPTU', 'Tipo': '%', 'Valor': 0.07},
-    {'Custo': 'Preparação do Terreno', 'Tipo': '%', 'Valor': 0.33},
-    {'Custo': 'Financiamento Bancário', 'Tipo': '%', 'Valor': 1.90},
+    {'Custo': 'IRPJ/CS/PIS/COFINS', '%': 4.00, 'Valor (R$)': vgv * 0.04},
+    {'Custo': 'Corretagem', '%': 3.61, 'Valor (R$)': vgv * 0.0361},
+    {'Custo': 'Publicidade', '%': 0.90, 'Valor (R$)': vgv * 0.0090},
+    {'Custo': 'Manutenção', '%': 0.50, 'Valor (R$)': vgv * 0.0050},
+    {'Custo': 'Custo Fixo IDIBRA', '%': 4.00, 'Valor (R$)': vgv * 0.04},
+    {'Custo': 'Assessoria Técnica', '%': 0.70, 'Valor (R$)': vgv * 0.0070},
+    {'Custo': 'Projetos', '%': 0.52, 'Valor (R$)': vgv * 0.0052},
+    {'Custo': 'Licenciamento e Incorporação', '%': 0.20, 'Valor (R$)': vgv * 0.0020},
+    {'Custo': 'Outorga Onerosa', '%': 0.00, 'Valor (R$)': vgv * 0.00},
+    {'Custo': 'Condomínio', '%': 0.00, 'Valor (R$)': vgv * 0.00},
+    {'Custo': 'IPTU', '%': 0.07, 'Valor (R$)': vgv * 0.0007},
+    {'Custo': 'Preparação do Terreno', '%': 0.33, 'Valor (R$)': vgv * 0.0033},
+    {'Custo': 'Financiamento Bancário', '%': 1.90, 'Valor (R$)': vgv * 0.0190},
 ])
 
 custos_indiretos_editavel = st.data_editor(
     custos_indiretos_padrao,
     column_config={
         "Custo": st.column_config.TextColumn("Custo", disabled=True),
-        "Tipo": st.column_config.SelectboxColumn("Tipo", options=['%', 'R$']),
-        "Valor": st.column_config.NumberColumn("Valor", min_value=0.0)
+        "%": st.column_config.NumberColumn("Percentual (%)", min_value=0.0, format="%.2f"),
+        "Valor (R$)": st.column_config.NumberColumn("Valor (R$)", disabled=True, format="R$ %.2f")
     },
     hide_index=True,
-    num_rows="dynamic",
+    num_rows="fixed",
     key="data_editor_custos"
 )
 
-# Recalcula os resultados com base nos parâmetros da barra lateral
+# Obtém a soma dos valores percentuais da tabela
+total_percentual_custos_indiretos = custos_indiretos_editavel['%'].sum()
+
+# Recalcula os resultados com base nos parâmetros e na tabela
 resultados = calcular_resultado_negocio(
     area_terreno=area_terreno,
     indice_aproveitamento=indice_aproveitamento,
     custo_direto_construcao_m2=custo_direto_construcao_m2,
     relacao_privativa_construida=relacao_privativa_construida,
     preco_medio_vendas=preco_medio_vendas,
-    custos_indiretos_data=custos_indiretos_editavel.to_dict('records')
+    custos_indiretos_percentual=total_percentual_custos_indiretos
 )
 
 st.markdown("---")
@@ -128,7 +140,6 @@ st.markdown("---")
 # Resumo do Projeto
 st.header("Resumo do Projeto")
 col1, col2, col3, col4, col5 = st.columns(5)
-    
 with col1:
     st.markdown(f"""
     <div class="card neutral">
@@ -136,7 +147,6 @@ with col1:
         <div class="card-metric">{area_terreno:,.2f} m²</div>
     </div>
     """, unsafe_allow_html=True)
-
 with col2:
     st.markdown(f"""
     <div class="card neutral">
@@ -144,7 +154,6 @@ with col2:
         <div class="card-metric">{indice_aproveitamento:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
-    
 with col3:
     st.markdown(f"""
     <div class="card neutral">
@@ -152,7 +161,6 @@ with col3:
         <div class="card-metric">{resultados['area_construida']:,.2f} m²</div>
     </div>
     """, unsafe_allow_html=True)
-    
 with col4:
     st.markdown(f"""
     <div class="card neutral">
@@ -160,7 +168,6 @@ with col4:
         <div class="card-metric">{resultados['area_privativa']:,.2f} m²</div>
     </div>
     """, unsafe_allow_html=True)
-    
 with col5:
     st.markdown(f"""
     <div class="card neutral">
