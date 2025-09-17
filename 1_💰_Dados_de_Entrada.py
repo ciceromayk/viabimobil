@@ -92,9 +92,7 @@ resultados = calcular_resultado_negocio(
     relacao_privativa_construida=relacao_privativa_construida,
     preco_medio_vendas=preco_medio_vendas
 )
-
 st.markdown("---")
-    
 # Resumo do Projeto
 st.header("Resumo do Projeto")
 col1, col2, col3, col4, col5 = st.columns(5)
@@ -138,8 +136,6 @@ with col5:
         <div class="card-metric">{relacao_privativa_construida:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
-
-st.markdown("---")
 
 # Resumo Financeiro
 st.header("Resumo Financeiro")
