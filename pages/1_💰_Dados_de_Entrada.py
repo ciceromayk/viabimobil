@@ -1,8 +1,4 @@
 import streamlit as st
-import pandas as pd
-
-# Importa a função do módulo de cálculos para uso futuro
-# from src.calculos_financeiros import calcular_vpl_tir
 
 st.set_page_config(
     page_title="Dados de Entrada",
@@ -11,28 +7,34 @@ st.set_page_config(
 
 st.title("💰 Dados de Entrada do Projeto")
 
-st.header("Informações do Terreno e da Obra")
-area_terreno = st.number_input("Área Total do Terreno (m²)", min_value=0.0)
-area_construida = st.number_input("Área Construída (m²)", min_value=0.0)
-custo_por_metro_quadrado = st.number_input("Custo Médio de Construção (R$/m²)", min_value=0.0)
+st.header("Informações do Terreno e Construção")
+area_terreno = st.number_input("Área do Terreno (m²)", min_value=0.0)
+indice_aproveitamento = st.slider(
+    "Índice de Aproveitamento",
+    min_value=1.00,
+    max_value=4.00,
+    value=1.00,
+    step=0.01,
+)
 
-st.header("Condições de Venda")
-preco_venda_por_metro_quadrado = st.number_input("Preço de Venda por m² (R$/m²)", min_value=0.0)
-taxa_deducao_vendas = st.slider("Deduções sobre Vendas (%)", min_value=0, max_value=100, value=15)
-
-st.header("Outras Informações")
-taxa_desconto = st.number_input("Taxa de Desconto Anual (%)", min_value=0.0)
-duracao_projeto = st.number_input("Duração do Projeto (meses)", min_value=1)
+st.header("Custos e Vendas")
+custo_por_metro_quadrado = st.number_input("Custo de Área Construída (R$/m²)", min_value=0.0)
+relacao_privativa_construida = st.slider(
+    "Relação Área Privativa / Área Construída",
+    min_value=0.00,
+    max_value=1.00,
+    value=0.70,
+    step=0.01,
+)
+preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
 
 # Botão para salvar os dados no Session State para uso em outras páginas
 if st.button("Salvar Dados"):
     st.session_state["dados_projeto"] = {
         "area_terreno": area_terreno,
-        "area_construida": area_construida,
+        "indice_aproveitamento": indice_aproveitamento,
         "custo_por_metro_quadrado": custo_por_metro_quadrado,
-        "preco_venda_por_metro_quadrado": preco_venda_por_metro_quadrado,
-        "taxa_deducao_vendas": taxa_deducao_vendas / 100, # Convertendo para decimal
-        "taxa_desconto": taxa_desconto / 100, # Convertendo para decimal
-        "duracao_projeto": duracao_projeto,
+        "relacao_privativa_construida": relacao_privativa_construida,
+        "preco_medio_vendas": preco_medio_vendas,
     }
     st.success("Dados salvos com sucesso! Agora você pode ir para a página de Resultados.")
