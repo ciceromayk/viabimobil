@@ -78,14 +78,14 @@ with st.expander("1. Terreno e Construção"):
             key="relacao_privativa"
         )
 
-with st.expander("2. Custos Diretos"):
-    custo_direto_construcao_m2 = st.number_input("Custo Direto de Construção (R$/m²)", min_value=0.0, key="custo_direto_construcao")
-
-with st.expander("3. Custos Indiretos"):
+with st.expander("2. Vendas"):
+    st.markdown("Os resultados da viabilidade serão atualizados com base nos custos e vendas inseridos.")
     preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0, key="preco_medio_vendas")
 
-    st.subheader("Custos indiretos baseados no VGV")
-    
+with st.expander("3. Custos Diretos"):
+    custo_direto_construcao_m2 = st.number_input("Custo Direto de Construção (R$/m²)", min_value=0.0, key="custo_direto_construcao")
+
+with st.expander("4. Custos Indiretos"):
     # O valor do VGV (calculado na seção '4. Vendas') é necessário para exibir a tabela de custos.
     # Como a página é executada de cima para baixo, o valor de 'preco_medio_vendas'
     # já estará disponível aqui.
@@ -97,6 +97,8 @@ with st.expander("3. Custos Indiretos"):
     # O input de 'preco_medio_vendas' foi movido para a seção '4. Vendas'.
     # Usamos o valor do 'session_state' para garantir que o cálculo seja feito.
     vgv = st.session_state.get('preco_medio_vendas', 0) * area_privativa
+
+    st.subheader("Custos indiretos baseados no VGV")
 
     # Define os valores padrão da tabela de custos indiretos
     if 'custos_indiretos_padrao' not in st.session_state:
@@ -139,9 +141,6 @@ with st.expander("3. Custos Indiretos"):
     with col5:
         preparacao_terreno = st.number_input("Preparação do Terreno (R$)", min_value=0.0, key="preparacao_terreno")
         financiamento_bancario = st.number_input("Financiamento Bancário (R$)", min_value=0.0, key="financiamento_bancario")
-
-with st.expander("4. Vendas"):
-    st.markdown("Os resultados da viabilidade serão atualizados com base nos custos e vendas inseridos.")
     
 # --- Execução do cálculo e exibição de resultados ---
 
