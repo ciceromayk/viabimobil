@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Importa as funções do módulo src
+# Importa a função do módulo src
 from src.calculos_financeiros import calcular_resultado_negocio
 
 st.set_page_config(
@@ -43,9 +43,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("---")
-
-# Seção de Parâmetros de Entrada
 st.subheader("Parâmetros do Projeto")
 col_construcao, col_vendas = st.columns(2)
 
@@ -76,140 +73,130 @@ with col_vendas:
     
 st.markdown("---")
 
-# Botão para calcular e exibir os resultados
-if st.button("Calcular Resultados", use_container_width=True, type="primary"):
-    # Recalcula os resultados com o preço de vendas padrão
-    resultados = calcular_resultado_negocio(
-        area_terreno=area_terreno,
-        indice_aproveitamento=indice_aproveitamento,
-        custo_por_metro_quadrado=custo_por_metro_quadrado,
-        relacao_privativa_construida=relacao_privativa_construida,
-        preco_medio_vendas=preco_medio_vendas
-    )
+# Seção de Resultados (agora em tempo real)
+st.header("Análise de Cenários")
+st.write("Altere os parâmetros acima para simular o impacto no resultado do negócio.")
+    
+# Slider para controlar a variação do preço
+variacao_preco = st.slider(
+    "Variação no Preço (%)",
+    min_value=-20,
+    max_value=20,
+    value=0,
+    step=1
+)
+    
+preco_ajustado = preco_medio_vendas * (1 + variacao_preco / 100)
+    
+# Cards de preço
+col_preco_original, col_preco_ajustado = st.columns(2)
+    
+with col_preco_original:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Preço Original (R$/m²)</div>
+        <div class="card-metric">R$ {preco_medio_vendas:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+with col_preco_ajustado:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Preço Ajustado (R$/m²)</div>
+        <div class="card-metric">R$ {preco_ajustado:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.header("Análise de Cenários")
-    st.write("Altere o preço de vendas para simular o impacto no resultado do negócio.")
-    
-    # Slider para controlar a variação do preço
-    variacao_preco = st.slider(
-        "Variação no Preço (%)",
-        min_value=-20,
-        max_value=20,
-        value=0,
-        step=1
-    )
-    
-    preco_ajustado = preco_medio_vendas * (1 + variacao_preco / 100)
-    
-    # Cards de preço
-    col_preco_original, col_preco_ajustado = st.columns(2)
-    
-    with col_preco_original:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Preço Original (R$/m²)</div>
-            <div class="card-metric">R$ {preco_medio_vendas:,.2f}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col_preco_ajustado:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Preço Ajustado (R$/m²)</div>
-            <div class="card-metric">R$ {preco_ajustado:,.2f}</div>
-        </div>
-        """, unsafe_allow_html=True)
+# Recalcula os resultados com o novo preço ajustado
+resultados_ajustados = calcular_resultado_negocio(
+    area_terreno=area_terreno,
+    indice_aproveitamento=indice_aproveitamento,
+    custo_por_metro_quadrado=custo_por_metro_quadrado,
+    relacao_privativa_construida=relacao_privativa_construida,
+    preco_medio_vendas=preco_ajustado
+)
 
-    # Recalcula os resultados com o novo preço ajustado
-    resultados_ajustados = calcular_resultado_negocio(
-        area_terreno=area_terreno,
-        indice_aproveitamento=indice_aproveitamento,
-        custo_por_metro_quadrado=custo_por_metro_quadrado,
-        relacao_privativa_construida=relacao_privativa_construida,
-        preco_medio_vendas=preco_ajustado
-    )
+st.markdown("---")
+    
+# Resumo do Projeto
+st.header("Resumo do Projeto")
+col1, col2, col3, col4, col5 = st.columns(5)
+    
+with col1:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Área do Terreno</div>
+        <div class="card-metric">{area_terreno:,.2f} m²</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("---")
+with col2:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Índice de Aproveitamento</div>
+        <div class="card-metric">{indice_aproveitamento:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Resumo do Projeto
-    st.header("Resumo do Projeto")
-    col1, col2, col3, col4, col5 = st.columns(5)
+with col3:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Área Construída</div>
+        <div class="card-metric">{resultados_ajustados['area_construida']:,.2f} m²</div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    with col1:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Área do Terreno</div>
-            <div class="card-metric">{area_terreno:,.2f} m²</div>
-        </div>
-        """, unsafe_allow_html=True)
+with col4:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Área Privativa</div>
+        <div class="card-metric">{resultados_ajustados['area_privativa']:,.2f} m²</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+with col5:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Relação AP/AC</div>
+        <div class="card-metric">{relacao_privativa_construida:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    with col2:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Índice de Aproveitamento</div>
-            <div class="card-metric">{indice_aproveitamento:,.2f}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Área Construída</div>
-            <div class="card-metric">{resultados_ajustados['area_construida']:,.2f} m²</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col4:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Área Privativa</div>
-            <div class="card-metric">{resultados_ajustados['area_privativa']:,.2f} m²</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col5:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Relação AP/AC</div>
-            <div class="card-metric">{relacao_privativa_construida:,.2f}</div>
-        </div>
-        """, unsafe_allow_html=True)
+st.markdown("---")
 
-    st.markdown("---")
-
-    # Resumo Financeiro
-    st.header("Resumo Financeiro")
-    col6, col7, col8, col9 = st.columns(4)
+# Resumo Financeiro
+st.header("Resumo Financeiro")
+col6, col7, col8, col9 = st.columns(4)
     
-    with col6:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">V.G.V.</div>
-            <div class="card-metric">R$ {resultados_ajustados['vgv']:,.2f}</div>
-        </div>
-        """, unsafe_allow_html=True)
+with col6:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">V.G.V.</div>
+        <div class="card-metric">R$ {resultados_ajustados['vgv']:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    with col7:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Custo Total</div>
-            <div class="card-metric">R$ {resultados_ajustados['custo_total']:,.2f}</div>
-        </div>
-        """, unsafe_allow_html=True)
+with col7:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Custo Total</div>
+        <div class="card-metric">R$ {resultados_ajustados['custo_total']:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    with col8:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Resultado do Negócio</div>
-            <div class="card-metric">R$ {resultados_ajustados['resultado_negocio']:,.2f}</div>
-        </div>
-        """, unsafe_allow_html=True)
+with col8:
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Resultado do Negócio</div>
+        <div class="card-metric">R$ {resultados_ajustados['resultado_negocio']:,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    with col9:
-        margem_lucro = (resultados_ajustados['resultado_negocio'] / resultados_ajustados['vgv']) * 100 if resultados_ajustados['vgv'] != 0 else 0
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">Margem de Lucro</div>
-            <div class="card-metric">{margem_lucro:,.2f}%</div>
-        </div>
-        """, unsafe_allow_html=True)
+with col9:
+    margem_lucro = (resultados_ajustados['resultado_negocio'] / resultados_ajustados['vgv']) * 100 if resultados_ajustados['vgv'] != 0 else 0
+    st.markdown(f"""
+    <div class="card">
+        <div class="card-title">Margem de Lucro</div>
+        <div class="card-metric">{margem_lucro:,.2f}%</div>
+    </div>
+    """, unsafe_allow_html=True)
