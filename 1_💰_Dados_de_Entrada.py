@@ -49,17 +49,15 @@ st.markdown("""
         background-color: #f0f2f6;
         border: 1px solid #e0e0e0;
     }
-    /* Ajusta a barra lateral para ser mais compacta */
-    .st-emotion-cache-1cypcdb {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 # ----- Sidebar para Parâmetros de Entrada -----
 with st.sidebar:
+    st.header("Análise de Viabilidade")
     st.subheader("Parâmetros do Projeto")
+    st.markdown("---")
+    
     st.subheader("1. Terreno e Construção")
     area_terreno = st.number_input("Área do Terreno (m²)", min_value=0.0)
     indice_aproveitamento = st.slider(
@@ -69,7 +67,7 @@ with st.sidebar:
         value=1.00,
         step=0.01,
     )
-    custo_por_metro_quadrado = st.number_input("Custo de Área Construída (R$/m²)", min_value=0.0)
+    custo_direto_construcao_m2 = st.number_input("Custo Direto de Construção (R$/m²)", min_value=0.0)
     relacao_privativa_construida = st.slider(
         "Relação AP / AC",
         min_value=0.00,
@@ -77,6 +75,9 @@ with st.sidebar:
         value=0.70,
         step=0.01,
     )
+    
+    st.markdown("---")
+
     st.subheader("2. Vendas")
     preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0)
 
@@ -84,15 +85,17 @@ with st.sidebar:
 st.title("💰 Análise de Viabilidade Imobiliária")
 st.write("Insira os parâmetros no menu lateral para a análise de viabilidade do seu projeto imobiliário.")
     
-# Recalcula os resultados com o novo preço ajustado
+# Recalcula os resultados com base nos parâmetros da barra lateral
 resultados = calcular_resultado_negocio(
     area_terreno=area_terreno,
     indice_aproveitamento=indice_aproveitamento,
-    custo_por_metro_quadrado=custo_por_metro_quadrado,
+    custo_direto_construcao_m2=custo_direto_construcao_m2,
     relacao_privativa_construida=relacao_privativa_construida,
     preco_medio_vendas=preco_medio_vendas
 )
+
 st.markdown("---")
+    
 # Resumo do Projeto
 st.header("Resumo do Projeto")
 col1, col2, col3, col4, col5 = st.columns(5)
@@ -136,6 +139,8 @@ with col5:
         <div class="card-metric">{relacao_privativa_construida:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
+
+st.markdown("---")
 
 # Resumo Financeiro
 st.header("Resumo Financeiro")
