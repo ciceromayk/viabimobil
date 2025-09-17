@@ -2,9 +2,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
+from numpy.lib.financial import npv, irr
 
 # Importa as funções do módulo src
-from src.calculos_financeiros import calcular_fluxo_de_caixa_projetado
+from src.calculos_financieros import calcular_fluxo_de_caixa_projetado
 from src.visualizacoes import plotar_fluxo_de_caixa
 
 st.set_page_config(
@@ -43,8 +44,8 @@ else:
     
     # Calcula VPL e TIR
     taxa_desconto_mensal = (1 + dados_projeto["taxa_desconto"])**(1/12) - 1
-    vpl = np.npv(taxa_desconto_mensal, fluxo_caixa_df["Fluxo de Caixa"].values)
-    tir = np.irr(fluxo_caixa_df["Fluxo de Caixa"].values)
+    vpl = npv(taxa_desconto_mensal, fluxo_caixa_df["Fluxo de Caixa"].values)
+    tir = irr(fluxo_caixa_df["Fluxo de Caixa"].values)
 
     st.markdown("---")
     
