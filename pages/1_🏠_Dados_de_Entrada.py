@@ -14,6 +14,21 @@ st.set_page_config(
 # Estabelece a conexão com o banco de dados
 conn = st.connection("postgresql", type="sql")
 
+# Estabelece a conexão com o banco de dados
+conn = st.connection("postgresql", type="sql")
+
+# Cria a tabela se ela não existir
+with conn.session as s:
+    s.execute("""
+        CREATE TABLE IF NOT EXISTS viabilidades (
+            id SERIAL PRIMARY KEY,
+            nome_terreno VARCHAR(255) UNIQUE,
+            dados JSONB,
+            data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+    s.commit()
+
 # Adiciona CSS para o estilo dos cards
 st.markdown("""
 <style>
