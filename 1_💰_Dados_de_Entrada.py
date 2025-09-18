@@ -142,6 +142,12 @@ with st.expander("4. Custos Indiretos"):
     df_custos = st.session_state.custos_indiretos_padrao.copy()
     df_custos['Valor (R$)'] = df_custos['%'] * (vgv_temp / 100)
     
+    # Calcula a altura exata da tabela para remover a scrollbar
+    # A altura de uma linha padrão no data_editor é aproximadamente 35px
+    altura_linha = 35 
+    altura_cabecalho = 39 # Altura aproximada do cabeçalho
+    altura_total_tabela = (len(df_custos) * altura_linha) + altura_cabecalho
+
     custos_indiretos_editavel = st.data_editor(
         df_custos,
         column_config={
@@ -151,19 +157,23 @@ with st.expander("4. Custos Indiretos"):
         },
         hide_index=True,
         num_rows="fixed",
-        height=300,
+        height=altura_total_tabela, # Define a altura calculada
         key="data_editor_custos"
     )
     st.session_state.custos_indiretos_padrao = custos_indiretos_editavel[['Custo', '%']]
 
     st.subheader("Custos relacionados ao Terreno / Produto")
-    col4, col5 = st.columns(2)
+    # Usa mais colunas para organizar os inputs em uma única linha
+    col4, col5, col6, col7, col8 = st.columns(5) 
     with col4:
         outorga_onerosa = st.number_input("Outorga Onerosa (R$)", min_value=0.0, key="outorga_onerosa")
-        condominio = st.number_input("Condomínio (R$)", min_value=0.0, key="condominio")
-        iptu = st.number_input("IPTU (R$)", min_value=0.0, key="iptu")
     with col5:
+        condominio = st.number_input("Condomínio (R$)", min_value=0.0, key="condominio")
+    with col6:
+        iptu = st.number_input("IPTU (R$)", min_value=0.0, key="iptu")
+    with col7:
         preparacao_terreno = st.number_input("Preparação do Terreno (R$)", min_value=0.0, key="preparacao_terreno")
+    with col8:
         financiamento_bancario = st.number_input("Financiamento Bancário (R$)", min_value=0.0, key="financiamento_bancario")
 
 # --- Execução do Cálculo e Exibição de Resultados ---
@@ -192,36 +202,36 @@ st.markdown("---")
 
 # Resumo do Projeto
 st.header("Resumo do Projeto")
-col1, col2, col3, col4, col5 = st.columns(5)
-with col1:
+col_proj_1, col_proj_2, col_proj_3, col_proj_4, col_proj_5 = st.columns(5)
+with col_proj_1:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Área do Terreno</div>
-        <div class="card-metric">{format_decimal(area_terreno, locale='pt_BR')} m²</div>
+        <div class="card-metric">{format_decimal(resultados['area_terreno'], locale='pt_BR')} m²</div>
     </div>
     """, unsafe_allow_html=True)
-with col2:
+with col_proj_2:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Índice de Aproveitamento</div>
         <div class="card-metric">{format_decimal(indice_aproveitamento, locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
-with col3:
+with col_proj_3:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Área Construída</div>
         <div class="card-metric">{format_decimal(resultados['area_construida'], locale='pt_BR')} m²</div>
     </div>
     """, unsafe_allow_html=True)
-with col4:
+with col_proj_4:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Área Privativa</div>
         <div class="card-metric">{format_decimal(resultados['area_privativa'], locale='pt_BR')} m²</div>
     </div>
     """, unsafe_allow_html=True)
-with col5:
+with col_proj_5:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Relação AP/AC</div>
@@ -260,15 +270,15 @@ st.markdown("---")
 
 # Resumo Financeiro
 st.header("Resumo Financeiro")
-col6, col7, col8 = st.columns(3)
-with col6:
+col_fin_1, col_fin_2, col_fin_3 = st.columns(3)
+with col_fin_1:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">V.G.V.</div>
         <div class="card-metric">{format_currency(resultados['vgv'], 'BRL', locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
-with col7:
+with col_fin_2:
     resultado_negocio = resultados['resultado_negocio']
     card_class = "positive" if resultado_negocio > 0 else "negative" if resultado_negocio < 0 else "neutral"
     st.markdown(f"""
@@ -277,7 +287,7 @@ with col7:
         <div class="card-metric">{format_currency(resultado_negocio, 'BRL', locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
-with col8:
+with col_fin_3:
     margem_lucro = resultados['margem_lucro']
     card_class = "positive" if margem_lucro > 0 else "negative" if margem_lucro < 0 else "neutral"
     st.markdown(f"""
