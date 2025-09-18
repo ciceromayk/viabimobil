@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from sqlalchemy import text
 
 # --- Configuração da Página e Conexão com o Banco ---
 st.set_page_config(
@@ -15,18 +16,17 @@ st.title("📁 Abrir Viabilidade Existente")
 st.write("Selecione uma viabilidade da lista abaixo para carregar os dados.")
 
 # Carrega a lista de viabilidades do banco de dados
-# O "conn.query" com cache (@st.cache_data) garante que a query só rode uma vez
+# O "@st.cache_data" garante que a query só rode uma vez
 # a menos que os parâmetros mudem.
 @st.cache_data(ttl=600)  # Cache por 10 minutos
 def get_viabilidades_from_db():
-    return conn.query("SELECT id, nome_terreno, data_criacao FROM viabilidades;")
+    return conn.query(text("SELECT id, nome_terreno, data_criacao FROM viabilidades;"))
 
 viabilidades_salvas = get_viabilidades_from_db()
 
 if viabilidades_salvas.empty:
     st.info("Nenhuma viabilidade salva ainda. Crie uma na página 'Análise de Viabilidade Imobiliária'.")
 else:
-    # Cria uma lista de nomes para o selectbox
     nomes_viabilidades = viabilidades_salvas['nome_terreno'].tolist()
     
     viabilidade_selecionada = st.selectbox(
@@ -39,8 +39,8 @@ else:
     if st.button("Carregar Viabilidade", type="primary"):
         if viabilidade_selecionada:
             # Busca a viabilidade completa pelo nome e carrega o JSON
-            query = f"SELECT dados FROM viabilidades WHERE nome_terreno = '{viabilidade_selecionada}';"
-            dados_viabilidade = conn.query(query).iloc[0]['dados']
+            query = text("SELECT dados FROM viabilidades WHERE nome_terreno = :nome;")
+            dados_viabilidade = conn.query(query, params={"nome": viabilidade_selecionada}).iloc[0]['dados']
             
             # Atualiza o estado da sessão com os dados do projeto carregado
             for key, value in dados_viabilidade.items():
