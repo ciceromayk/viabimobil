@@ -62,7 +62,6 @@ st.title("💰 Análise de Viabilidade Imobiliária")
 st.write("Insira os parâmetros para a análise de viabilidade do seu projeto imobiliário.")
 
 # --- Funções de Cálculo ---
-
 def calcular_viabilidade(area_terreno, indice_aproveitamento, relacao_privativa_construida,
                          preco_medio_vendas, custo_direto_construcao_m2, custos_indiretos_percentuais_df,
                          custos_indiretos_monetarios_dict):
@@ -93,7 +92,7 @@ def calcular_viabilidade(area_terreno, indice_aproveitamento, relacao_privativa_
     margem_lucro = (resultado_negocio / vgv) * 100 if vgv > 0 else 0
     
     return {
-        'area_terreno': area_terreno, # Adicionamos a área do terreno aos resultados
+        'area_terreno': area_terreno,
         'area_privativa': area_privativa,
         'area_construida': area_construida,
         'vgv': vgv,
@@ -109,7 +108,7 @@ def calcular_viabilidade(area_terreno, indice_aproveitamento, relacao_privativa_
 with st.expander("1. Terreno e Construção"):
     col1, col2, col3 = st.columns(3)
     with col1:
-        area_terreno = st.number_input("Área do Terreno (m²)", min_value=0.0, key="area_terreno")
+        area_terreno = st.number_input("Área do Terreno (m²)", min_value=0.0, key="area_terreno", format="%.2f")
     with col2:
         indice_aproveitamento = st.slider(
             "Índice de Aproveitamento", min_value=1.00, max_value=4.00, value=1.00, step=0.01, key="indice_aproveitamento"
@@ -121,10 +120,10 @@ with st.expander("1. Terreno e Construção"):
 
 with st.expander("2. Vendas"):
     st.markdown("Os resultados da viabilidade serão atualizados com base nos custos e vendas inseridos.")
-    preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0, key="preco_medio_vendas")
+    preco_medio_vendas = st.number_input("Preço Médio de Vendas (R$/m²)", min_value=0.0, key="preco_medio_vendas", format="%.2f")
 
 with st.expander("3. Custos Diretos"):
-    custo_direto_construcao_m2 = st.number_input("Custo Direto de Construção (R$/m²)", min_value=0.0, key="custo_direto_construcao")
+    custo_direto_construcao_m2 = st.number_input("Custo Direto de Construção (R$/m²)", min_value=0.0, key="custo_direto_construcao", format="%.2f")
 
 with st.expander("4. Custos Indiretos"):
     # Define os valores padrão da tabela de custos indiretos
@@ -146,6 +145,9 @@ with st.expander("4. Custos Indiretos"):
     vgv_temp = preco_medio_vendas * area_privativa_temp
     
     df_custos = st.session_state.custos_indiretos_padrao.copy()
+    
+    # Converte a coluna '%' para número antes de fazer o cálculo
+    df_custos['%'] = pd.to_numeric(df_custos['%'])
     df_custos['Valor (R$)'] = df_custos['%'] * (vgv_temp / 100)
     
     altura_linha = 35 
@@ -169,15 +171,15 @@ with st.expander("4. Custos Indiretos"):
     st.subheader("Custos relacionados ao Terreno / Produto")
     col4, col5, col6, col7, col8 = st.columns(5) 
     with col4:
-        outorga_onerosa = st.number_input("Outorga Onerosa (R$)", min_value=0.0, key="outorga_onerosa")
+        outorga_onerosa = st.number_input("Outorga Onerosa (R$)", min_value=0.0, key="outorga_onerosa", format="%.2f")
     with col5:
-        condominio = st.number_input("Condomínio (R$)", min_value=0.0, key="condominio")
+        condominio = st.number_input("Condomínio (R$)", min_value=0.0, key="condominio", format="%.2f")
     with col6:
-        iptu = st.number_input("IPTU (R$)", min_value=0.0, key="iptu")
+        iptu = st.number_input("IPTU (R$)", min_value=0.0, key="iptu", format="%.2f")
     with col7:
-        preparacao_terreno = st.number_input("Preparação do Terreno (R$)", min_value=0.0, key="preparacao_terreno")
+        preparacao_terreno = st.number_input("Preparação do Terreno (R$)", min_value=0.0, key="preparacao_terreno", format="%.2f")
     with col8:
-        financiamento_bancario = st.number_input("Financiamento Bancário (R$)", min_value=0.0, key="financiamento_bancario")
+        financiamento_bancario = st.number_input("Financiamento Bancário (R$)", min_value=0.0, key="financiamento_bancario", format="%.2f")
 
 # --- Execução do Cálculo e Exibição de Resultados ---
 custos_indiretos_monetarios_dict = {
