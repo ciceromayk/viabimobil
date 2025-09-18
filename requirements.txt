@@ -1,6 +1,5 @@
-babel
 streamlit
 pandas
-numpy
-plotly
-numpy-financial
+babel
+SQLAlchemy
+psycopg2-binary
