@@ -18,3 +18,5 @@ st.write("---")
 if 'resultados_viabilidade' in st.session_state:
     st.subheader("Dados Atuais da Viabilidade")
     st.json(st.session_state['resultados_viabilidade'])
+else:
+    st.warning("Nenhum dado de viabilidade disponível na sessão. Por favor, crie ou carregue um projeto primeiro.")
