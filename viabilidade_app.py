@@ -6,5 +6,5 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("Selecione uma opção no menu lateral")
+st.title("Bem-vindo à Análise de Viabilidade Imobiliária")
 st.markdown("Use o menu ao lado para **criar uma nova viabilidade** ou **carregar um projeto existente**.")
