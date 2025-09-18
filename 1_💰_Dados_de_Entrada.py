@@ -2,19 +2,12 @@ import streamlit as st
 import pandas as pd
 from babel.numbers import format_currency, format_decimal
 
-# --- Configuração da Página e do Menu Lateral ---
+# --- Configuração da Página ---
 st.set_page_config(
     page_title="Viabilidade Imobiliária",
     page_icon="🏠",
     layout="wide"
 )
-
-# Adiciona o menu lateral
-with st.sidebar:
-    st.header("Menu de Viabilidade")
-    st.subheader("Criar nova viabilidade")
-    st.subheader("Abrir viabilidade existente")
-    st.subheader("Gerar relatório PDF")
 
 # Adiciona CSS para o estilo dos cards
 st.markdown("""
@@ -62,7 +55,7 @@ st.title("💰 Análise de Viabilidade Imobiliária")
 st.write("Insira os parâmetros para a análise de viabilidade do seu projeto imobiliário.")
 
 # --- Funções de Cálculo ---
-def calcular_viabilidade(area_terreno, indice_aproveitamento, relacao_privativa_construida,
+def calcular_viabilidade(nome_terreno, area_terreno, indice_aproveitamento, relacao_privativa_construida,
                          preco_medio_vendas, custo_direto_construcao_m2, custos_indiretos_percentuais_df,
                          custos_indiretos_monetarios_dict):
     """Calcula todas as métricas financeiras e de área do projeto."""
@@ -92,6 +85,7 @@ def calcular_viabilidade(area_terreno, indice_aproveitamento, relacao_privativa_
     margem_lucro = (resultado_negocio / vgv) * 100 if vgv > 0 else 0
     
     return {
+        'nome_terreno': nome_terreno, # Adicionado o nome do terreno
         'area_terreno': area_terreno,
         'area_privativa': area_privativa,
         'area_construida': area_construida,
@@ -106,6 +100,7 @@ def calcular_viabilidade(area_terreno, indice_aproveitamento, relacao_privativa_
 # --- Entrada de Dados (Interface do Usuário) ---
 
 with st.expander("1. Terreno e Construção"):
+    nome_terreno = st.text_input("Nome do Terreno", key="nome_terreno")
     col1, col2, col3 = st.columns(3)
     with col1:
         area_terreno = st.number_input("Área do Terreno (m²)", min_value=0.0, key="area_terreno", format="%.2f")
@@ -146,7 +141,6 @@ with st.expander("4. Custos Indiretos"):
     
     df_custos = st.session_state.custos_indiretos_padrao.copy()
     
-    # Converte a coluna '%' para número antes de fazer o cálculo
     df_custos['%'] = pd.to_numeric(df_custos['%'])
     df_custos['Valor (R$)'] = df_custos['%'] * (vgv_temp / 100)
     
@@ -191,6 +185,7 @@ custos_indiretos_monetarios_dict = {
 }
 
 resultados = calcular_viabilidade(
+    nome_terreno,
     area_terreno,
     indice_aproveitamento,
     relacao_privativa_construida,
@@ -205,6 +200,9 @@ st.markdown("---")
 
 # Resumo do Projeto
 st.header("Resumo do Projeto")
+# Adiciona o nome do terreno aos cards
+st.subheader(f"Viabilidade do Terreno: {resultados['nome_terreno']}")
+
 col_proj_1, col_proj_2, col_proj_3, col_proj_4, col_proj_5 = st.columns(5)
 with col_proj_1:
     st.markdown(f"""
@@ -299,3 +297,6 @@ with col_fin_3:
         <div class="card-metric">{format_decimal(margem_lucro, locale='pt_BR')}%</div>
     </div>
     """, unsafe_allow_html=True)
+
+# Salvar dados na session_state para compartilhar entre páginas
+st.session_state['resultados_viabilidade'] = resultados
