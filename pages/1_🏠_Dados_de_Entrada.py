@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from babel.numbers import format_currency, format_decimal
 from datetime import datetime
+from sqlalchemy import text
 
 # --- Configuração da Página e Conexão com o Banco ---
 st.set_page_config(
@@ -131,8 +132,9 @@ def calcular_viabilidade(nome_terreno, area_terreno, indice_aproveitamento, rela
 def salvar_viabilidade(viabilidade):
     try:
         with conn.session as s:
+            # Use a função text() do SQLAlchemy para a consulta SQL
             s.execute(
-                "INSERT INTO viabilidades (nome_terreno, dados) VALUES (:nome, :dados);",
+                text("INSERT INTO viabilidades (nome_terreno, dados) VALUES (:nome, :dados);"),
                 params=dict(
                     nome=viabilidade['nome_terreno'],
                     dados=viabilidade
@@ -145,7 +147,6 @@ def salvar_viabilidade(viabilidade):
 
 # --- Entrada de Dados (Interface do Usuário) ---
 with st.expander("1. Terreno e Construção"):
-    # Garante que o estado da sessão tenha a chave 'nome_terreno'
     if 'nome_terreno' not in st.session_state:
         st.session_state.nome_terreno = ''
 
@@ -246,14 +247,13 @@ custos_indiretos_monetarios_dict = {
     'financiamento_bancario': financiamento_bancario
 }
 
-# Passa o nome do terreno e os demais inputs para a função de cálculo
 resultados = calcular_viabilidade(
-    nome_terreno,
-    area_terreno,
-    indice_aproveitamento,
-    relacao_privativa_construida,
-    preco_medio_vendas,
-    custo_direto_construcao_m2,
+    st.session_state.nome_terreno,
+    st.session_state.area_terreno,
+    st.session_state.indice_aproveitamento,
+    st.session_state.relacao_privativa_construida,
+    st.session_state.preco_medio_vendas,
+    st.session_state.custo_direto_construcao,
     st.session_state.custos_indiretos_padrao,
     custos_indiretos_monetarios_dict
 )
@@ -261,7 +261,7 @@ resultados = calcular_viabilidade(
 # --- Botão de Salvar ---
 st.markdown("---")
 if st.button("💾 Salvar Viabilidade", type="primary"):
-    if nome_terreno:
+    if st.session_state.nome_terreno:
         salvar_viabilidade(resultados)
     else:
         st.warning("Por favor, digite o nome do terreno antes de salvar.")
@@ -283,7 +283,7 @@ with col_proj_2:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Índice de Aproveitamento</div>
-        <div class="card-metric">{format_decimal(indice_aproveitamento, locale='pt_BR')}</div>
+        <div class="card-metric">{format_decimal(st.session_state.indice_aproveitamento, locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
 with col_proj_3:
@@ -304,7 +304,7 @@ with col_proj_5:
     st.markdown(f"""
     <div class="card neutral">
         <div class="card-title">Relação AP/AC</div>
-        <div class="card-metric">{format_decimal(relacao_privativa_construida, locale='pt_BR')}</div>
+        <div class="card-metric">{format_decimal(st.session_state.relacao_privativa_construida, locale='pt_BR')}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -364,5 +364,4 @@ with col_fin_3:
     </div>
     """, unsafe_allow_html=True)
 
-# Salva o dicionário de resultados completo na session_state para ser acessado por outras páginas
 st.session_state['resultados_viabilidade'] = resultados
