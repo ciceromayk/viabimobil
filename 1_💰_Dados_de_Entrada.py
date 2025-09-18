@@ -2,12 +2,19 @@ import streamlit as st
 import pandas as pd
 from babel.numbers import format_currency, format_decimal
 
-# --- Configuração da Página ---
+# --- Configuração da Página e do Menu Lateral ---
 st.set_page_config(
     page_title="Viabilidade Imobiliária",
     page_icon="🏠",
     layout="wide"
 )
+
+# Adiciona o menu lateral
+with st.sidebar:
+    st.header("Menu de Viabilidade")
+    st.subheader("Criar nova viabilidade")
+    st.subheader("Abrir viabilidade existente")
+    st.subheader("Gerar relatório PDF")
 
 # Adiciona CSS para o estilo dos cards
 st.markdown("""
@@ -86,6 +93,7 @@ def calcular_viabilidade(area_terreno, indice_aproveitamento, relacao_privativa_
     margem_lucro = (resultado_negocio / vgv) * 100 if vgv > 0 else 0
     
     return {
+        'area_terreno': area_terreno, # Adicionamos a área do terreno aos resultados
         'area_privativa': area_privativa,
         'area_construida': area_construida,
         'vgv': vgv,
@@ -134,18 +142,14 @@ with st.expander("4. Custos Indiretos"):
     
     st.subheader("Custos indiretos baseados no VGV")
     
-    # A variável 'vgv' precisa ser calculada aqui para exibir na tabela de forma dinâmica
     area_privativa_temp = area_terreno * indice_aproveitamento
     vgv_temp = preco_medio_vendas * area_privativa_temp
     
-    # Cria uma cópia da tabela para exibição e permite a edição
     df_custos = st.session_state.custos_indiretos_padrao.copy()
     df_custos['Valor (R$)'] = df_custos['%'] * (vgv_temp / 100)
     
-    # Calcula a altura exata da tabela para remover a scrollbar
-    # A altura de uma linha padrão no data_editor é aproximadamente 35px
     altura_linha = 35 
-    altura_cabecalho = 39 # Altura aproximada do cabeçalho
+    altura_cabecalho = 39 
     altura_total_tabela = (len(df_custos) * altura_linha) + altura_cabecalho
 
     custos_indiretos_editavel = st.data_editor(
@@ -157,13 +161,12 @@ with st.expander("4. Custos Indiretos"):
         },
         hide_index=True,
         num_rows="fixed",
-        height=altura_total_tabela, # Define a altura calculada
+        height=altura_total_tabela,
         key="data_editor_custos"
     )
     st.session_state.custos_indiretos_padrao = custos_indiretos_editavel[['Custo', '%']]
 
     st.subheader("Custos relacionados ao Terreno / Produto")
-    # Usa mais colunas para organizar os inputs em uma única linha
     col4, col5, col6, col7, col8 = st.columns(5) 
     with col4:
         outorga_onerosa = st.number_input("Outorga Onerosa (R$)", min_value=0.0, key="outorga_onerosa")
@@ -177,7 +180,6 @@ with st.expander("4. Custos Indiretos"):
         financiamento_bancario = st.number_input("Financiamento Bancário (R$)", min_value=0.0, key="financiamento_bancario")
 
 # --- Execução do Cálculo e Exibição de Resultados ---
-# Reúne os custos monetários em um dicionário para a função de cálculo
 custos_indiretos_monetarios_dict = {
     'outorga_onerosa': outorga_onerosa,
     'condominio': condominio,
@@ -186,7 +188,6 @@ custos_indiretos_monetarios_dict = {
     'financiamento_bancario': financiamento_bancario
 }
 
-# Chama a função principal de cálculo
 resultados = calcular_viabilidade(
     area_terreno,
     indice_aproveitamento,
